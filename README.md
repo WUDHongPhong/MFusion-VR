@@ -57,9 +57,9 @@ Python: 3.12.
 
 2. Thiết lập Biến Môi trường (Environment Variables)
 
-'''HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
+HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
 
-GEMINI_API_KEY: Key truy cập từ Google AI Studio.'''
+GEMINI_API_KEY: Key truy cập từ Google AI Studio.
 
 3. Cài đặt Thư viện Lõi
 
