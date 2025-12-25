@@ -44,13 +44,6 @@ Real-time Synchronized Tracking: Đồng bộ hóa mốc thời gian video dựa
 
 Temporal Context (Neighboring Frames): Hiển thị các khung hình lân cận (trước và sau) giúp người dùng hiểu rõ diễn biến sự kiện.
 
-🚀 Technical Achievements
-
-Vị trí: Quán quân (Bảng B) - HCMC AI Challenge 2025.
-
-Hiệu năng: Tốc độ phản hồi < 1s trên hàng triệu frame ảnh nhờ chỉ mục FAISS IndexFlatIP.
-
-Độ chính xác: Tối ưu hóa vượt trội thông qua quy trình huấn luyện "tiếp sức" (Relay Training) trên môi trường GPU điện toán đám mây.
 
 🛠 Deployment Guide
 
@@ -64,9 +57,9 @@ Python: 3.12.
 
 2. Thiết lập Biến Môi trường (Environment Variables)
 
-HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
+'''HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
 
-GEMINI_API_KEY: Key truy cập từ Google AI Studio.
+GEMINI_API_KEY: Key truy cập từ Google AI Studio.'''
 
 3. Cài đặt Thư viện Lõi
 
