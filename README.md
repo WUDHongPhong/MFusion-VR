@@ -12,29 +12,37 @@ Dữ liệu được cung cấp bởi Ban tổ chức bao gồm các thành ph�
 
 Video Archives: Tập hợp các video thô có nội dung đa dạng và thời lượng ~ 20 phút, đóng vai trò là nguồn dữ liệu gốc cần được truy vấn.
 
-Dense Keyframes: Tập dữ liệu ảnh được trích xuất với tần suất cao từ video gốc. Một video dài có thể bao gồm hàng trăm đến hàng ngàn ảnh, đảm bảo tính liên tục của nội dung nhưng đồng thời tạo áp lực lớn lên khả năng lưu trữ và truy vấn.
+Dense Keyframes: Tập dữ liệu ảnh được trích xuất với tần suất cao từ video gốc. Một video dài có thể bao gồm hàng trăm đến hàng ngàn ảnh, đảm bảo tính liên tục của nội dung nhưng tạo áp lực lớn lên khả năng truy xuất.
 
-Metadata: Các thông tin kỹ thuật đi kèm video như tên, thời gian khung hình (mili giây), fps, frame_idx, link video đến Youtube,….
-
-Còn một số dữ liệu nữa nhưng nhóm không sử dụng đến nên không đề cập.
+Metadata: Các thông tin kỹ thuật đi kèm video như tên, thời gian khung hình (pts_time), fps, frame_idx, link video đến Youtube, v.v.
 
 2. Core Search Functionalities
 
-Hệ thống cung cấp bốn cơ chế truy vấn chính dựa trên các mô hình  tiên tiến:
+Hệ thống cung cấp bốn cơ chế truy vấn chính dựa trên các mô hình tiên tiến:
 
 Text-to-Image Search: Người dùng nhập mô tả văn bản tự nhiên. Hệ thống tính toán độ tương đồng cosine trong không gian nhúng (Embedding Space) và trả về Top-K frames ảnh có điểm số cao nhất.
 
-Image-to-Image Search (Similarity Search): Cho phép người dùng tải lên một hình ảnh mẫu. Hệ thống trích xuất đặc trưng thị giác từ ảnh đó và so khớp với kho dữ liệu vector để tìm kiếm các frame có sự tương đồng về bối cảnh, thực thể hoặc bố cục.
+Image-to-Image Search (Similarity Search): Cho phép người dùng tải lên một hình ảnh mẫu. Hệ thống trích xuất đặc trưng thị giác từ ảnh đó và so khớp với kho dữ liệu vector để tìm kiếm các frame có sự tương đồng.
 
-ASR Retrieval (Audio-based): Truy vấn trực tiếp dựa trên lời thoại và âm thanh được trích xuất trực tiếp từ video. Chức năng này giúp xác định các sự kiện thông qua các từ khóa hội thoại.
+ASR Retrieval (Audio-based): Truy vấn dựa trên lời thoại và âm thanh được trích xuất trực tiếp từ video, giúp xác định các sự kiện thông qua từ khóa hội thoại.
 
-OCR Retrieval (Frame-based Text): Khác với các hệ thống quét text từ video thô, MFusion-VR tập trung truy vấn chữ viết xuất hiện trực tiếp trong từng frame ảnh (như biển số xe, biển hiệu, văn bản trên đường phố), giúp tăng độ phân giải và độ chính xác khi nhận diện.
+OCR Retrieval (Frame-based Text): Tập trung truy vấn chữ viết xuất hiện trực tiếp trong từng frame ảnh (biển số xe, biển hiệu, văn bản đường phố), giúp tăng độ phân giải và độ chính xác nhận diện.
 
-3. User Interface & Interaction
+3. User Interface & Interaction (UI/UX)
 
-Hệ thống được thiết kế với giao diện trực quan, hỗ trợ quy trình làm việc (workflow) từ tìm kiếm đến phân tích kết quả và nộp bài (submission):
+Giao diện của MFusion-VR được thiết kế tối ưu để giảm thiểu thời gian tương tác và tăng cường hiệu suất kiểm tra độ chính xác (Verification) trong điều kiện thi đấu:
 
+Semantic Translation Layer (Gemini Pro): Hệ thống tích hợp Gemini API để tự động chuyển đổi truy vấn từ tiếng Việt sang tiếng Anh trước khi đưa vào mô hình nhúng.
 
+Scalable Top-K Results: Mặc định hệ thống trả về 100 kết quả hàng đầu, nhưng người dùng có thể tùy chỉnh quy mô (Scale) linh hoạt.
+
+Lazy Loading Mechanism: Áp dụng kỹ thuật tải chậm thông qua IntersectionObserver. Ảnh chỉ được tải khi người dùng lướt tới khung hình tương ứng, giúp giao diện vận hành mượt mà.
+
+Integrated Multimedia Player: Trình phát YouTube được tích hợp trực tiếp, cho phép xem video ngay tại mốc thời gian của frame đang chọn mà không cần chuyển tab.
+
+Real-time Synchronized Tracking: Đồng bộ hóa mốc thời gian video dựa trên thuộc tính pts_time từ metadata, hỗ trợ xác định chính xác thời điểm xảy ra sự kiện theo dữ liệu của BTC.
+
+Temporal Context (Neighboring Frames): Hiển thị các khung hình lân cận (trước và sau) giúp người dùng hiểu rõ diễn biến sự kiện.
 
 🚀 Technical Achievements
 
@@ -58,7 +66,7 @@ Python: 3.12.
 
 HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
 
-GEMINI_API_KEY: Key truy cập từ Google AI Studio dùng cho lớp dịch thuật ngữ nghĩa.
+GEMINI_API_KEY: Key truy cập từ Google AI Studio.
 
 3. Cài đặt Thư viện Lõi
 
@@ -70,7 +78,7 @@ pip install transformers datasets accelerate bitsandbytes pandas pyarrow peft fl
 
 Bước 1: Trích xuất Caption (Image Captioning)
 
-Mỗi thành viên xử lý một tập Keyframes tương ứng bằng cách sử dụng script trích xuất:
+Mỗi thành viên xử lý một tập Keyframes tương ứng:
 
 python generate_captions.py --target L21
 
@@ -85,11 +93,17 @@ Phương pháp: Sử dụng file metadata_final.csv sau khi gộp từ các capt
 
 Bước 3: Trích xuất Đặc trưng (Feature Extraction)
 
-Tải trọng số đã fine-tune (fine_tuned_model_lora_2025) và tiến hành trích xuất vector lại cho toàn bộ tập dữ liệu để thay thế baseline yếu của BTC.
+Tải trọng số đã fine-tune (fine_tuned_model_lora_2025) và trích xuất lại vector để thay thế baseline cũ của BTC.
 
 💡 Các Kỹ thuật Đột phá (Technical Innovations)
 
-Relay Fine-Tuning: Kỹ thuật huấn luyện tiếp sức trên đám mây giúp mô hình học được các thực thể đặc thù trong đô thị Việt Nam nhanh hơn 5-10 lần.
+Relay Fine-Tuning: Kỹ thuật huấn luyện tiếp sức trên đám mây giúp mô hình học các thực thể đặc thù nhanh hơn 5-10 lần.
+
+Dual-Layer Caching Strategy: Đây là giải pháp tối ưu hóa hiệu năng cốt lõi của hệ thống, bao gồm:
+
+Disk Caching (hf_cache): Điều hướng lưu trữ các tài nguyên mô hình dung lượng lớn (CLIP weights, LoRA adapters) vào thư mục chỉ định qua biến HF_HOME. Kỹ thuật này giúp giải phóng phân vùng hệ thống, tránh việc tải lại mô hình từ Internet và đảm bảo tính sẵn sàng cao của tài nguyên vật lý.
+
+In-Memory Metadata Caching: Do Metadata cần truy xuất lặp đi lặp lại với tần suất cực cao cho các tính năng thời gian thực, hệ thống thực hiện nạp sẵn toàn bộ dữ liệu vào RAM khi khởi chạy. Giải pháp này triệt tiêu hoàn toàn độ trễ đọc file từ ổ đĩa (Disk I/O), đảm bảo dữ liệu được truyền lên UI ngay lập tức mà không gây nghẽn cổ chai.
 
 Temporal Interpolation: Thuật toán nội suy tuyến tính dựa trên FPS thực tế giúp ước tính chính xác frame_idx.
 
