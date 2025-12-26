@@ -2,6 +2,8 @@
 
 MFusion-VR (Multi-modal Fusion Video Retrieval) là một hệ thống hỗ trợ người dùng truy xuất hình ảnh đa phương thức nhằm mục đích tìm kiếm nội dung hình ảnh và thông tin video nâng cao từ kho dữ liệu lớn, kết hợp sức mạnh của thị giác máy tính và xử lý ngôn ngữ tự nhiên. Giải pháp này được đánh giá cao và xuất sắc đạt vị trí Quán quân Bảng B tại Hội thi Thử thách Trí tuệ Nhân tạo thành phố Hồ Chí Minh 2025 (AI Challenge 2025 TP.HCM) nhờ khả năng truy vấn ngữ nghĩa chính xác và giao diện thân thiện với người dùng.
 
+*Lưu ý: ở đây chỉ cung cấp Pipeline mà nhóm thực hiện và hướng dẫn cách chạy hệ thống dựa trên dữ liệu đã được huấn luyện sẵn.* 
+
 ## 🌟 System Overview
 Hệ thống được xây dựng trên kiến trúc Hybrid Multimodal Retrieval, tích hợp nhiều phương thức trích xuất đặc trưng và xử lý dữ liệu chuyên sâu để thu hẹp khoảng cách ngữ nghĩa giữa ngôn ngữ tự nhiên và nội dung thị giác.
 
@@ -46,13 +48,15 @@ Hệ thống cung cấp bốn cơ chế truy vấn chính dựa trên các mô h
 
 ## 🛠 Deployment Guide
 
-### 1. Yêu cầu Hệ thống & Môi trường
+### 1. Yêu cầu hệ thống & Môi trường
+
+**Mục tiêu:** Không bị xung đột phiên bản khi chạy hệ thống.
 
 Hệ điều hành: Windows 10/11 hoặc Linux.
 
 Phần cứng: NVIDIA GPU (Tối thiểu 4GB VRAM, khuyên dùng RTX 30-series trở lên).
 
-Python: 3.12.
+Python: 3.12.8.
 
 ### 2. Tải Dữ liệu và Code
 
@@ -60,7 +64,7 @@ Python: 3.12.
 
 **Hành động:** Tải về data và giải nén thư mục dự án (ví dụ: `AIC2025.zip`) vào ổ `D:\`. Sau khi giải nén, bạn sẽ có một thư mục `D:\AIC2025` chứa tất cả dữ liệu thô (`Keyframes`, `objects`, `map-keyframes`, `media-info`,...) và các file code (`.py`, `js`, `css`, `.html`,...).
 
-**Cấu trúc thư mục như sau:**  
+**📂 Cấu trúc thư mục như sau:**  
 ```
  D:\AIC2025/
 ├── Keyframes/                  # Thư mục gốc chứa dữ liệu thị giác.
@@ -95,55 +99,86 @@ Python: 3.12.
 └── image_paths.json            # Danh sách đường dẫn ảnh ánh xạ với FAISS
 
 ```
-### 3. Thiết lập Môi trường (Environment Variables)
+### 3. Thiết lập môi trường (Environment Variables)
 
-HF_HOME: Đường dẫn lưu trữ cache của Hugging Face (ví dụ: D:\hf_cache).
+#### 3.1. Thiết lập biến môi trường và API Keys
 
-GEMINI_API_KEY: Key truy cập từ Google AI Studio.
+**Mục tiêu:** Cấu hình để các model tải về được lưu trên ổ D và thiết lập các API key cần thiết.
 
-3. Cài đặt Thư viện Lõi
+ **Tạo thư mục Cache trên ổ D:**
+ 1. Trong terminal PowerShell, gõ lệnh sau và nhấn Enter:
+      ```powershell
+      mkdir D:\hf_cache
+      ```
 
-pip install torch torchvision torchaudio --index-url [https://download.pytorch.org/whl/cu121](https://download.pytorch.org/whl/cu121)
-pip install transformers datasets accelerate bitsandbytes pandas pyarrow peft flask google-generativeai faiss-cpu Flask-Cors
+2.  **Thiết lập Biến Môi trường Hệ thống:**
+    Nhấn phím `Windows` và gõ "Edit the system environment variables" rồi chọn kết quả tương ứng.
+    
+      Trong cửa sổ hiện ra, nhấn nút `Environment Variables...`.
+    
+      Trong phần `User variables`, nhấn `New...` và tạo 2 biến sau:
+    
+      **Biến 1 (Hugging Face Cache):**
+    
+        Variable name: HF_HOME
+        Variable value: D:\hf_cache
+      **Biến 2 (Gemini API):**
+    
+        Lấy API Key của bạn từ [Google AI Studio](https://aistudio.google.com/app/apikey).
+        Variable name: GEMINI_API_KEY
+        Variable value: (Dán chuỗi API key của bạn vào đây)
+    
+      Nhấn `OK` trên tất cả các cửa sổ để lưu lại.
+
+     *Lưu ý: Đóng VSCode hoàn toàn và mở lại để các thay đổi có hiệu lực.*
+
+3.  **Đăng nhập Hugging Face:**
+    Lấy Access Token (quyền `read`) của bạn từ [Hugging Face Tokens](https://huggingface.co/settings/tokens).
+    
+     Mở lại terminal trong VSCode tại `D:\AIC2025`.
+    
+    Gõ lệnh sau và nhấn Enter:
+      ```powershell
+      huggingface-cli login
+      ```
+      Dán token của bạn vào và nhấn Enter.
+
+      *Lưu ý: khi dán token vào terminal nó sẽ vô hình đoạn mã nên cứ dán rồi ấn Enter.*
+
+#### 3.2. Tạo môi trường ảo và cài đặt thư viện
+
+**Mục tiêu:** Tạo một không gian riêng cho dự án và cài đặt tất cả các công cụ cần thiết.
+
+**Tạo môi trường ảo:** 
+Trong terminal, gõ lệnh sau và nhấn Enter (Hoặc có thể tạo bằng Anaconda nhưng phải đúng phiên bản Python):
+
+      powershell
+      python -m venv .venv
+ 
+
+**Kích hoạt môi trường ảo:**
+    Gõ lệnh sau và nhấn Enter. Bạn phải làm điều này mỗi khi mở một terminal mới cho hệ thống.
+    
+      .\.venv\Scripts\Activate.ps1
+
+**Cài đặt các thư viện cần thiết**
+
+    pip install -r requirements.txt
+    
+## ▶️ Chạy ứng dụng
+```
+powershell
+python app.py
+```
+
+## 🧬 Quy trình xử lý Dữ liệu (Pipeline)
 
 
-🧬 Quy trình Xử lý Dữ liệu (Pipeline)
+## 👥 Đội ngũ Phát triển
 
-Bước 1: Trích xuất Caption (Image Captioning)
+Dự án MFusion-VR được thực hiện bởi WuDButterflies (Nguyễn Thành Luân, Nguyễn Xuân Huy, Nguyễn Xuân Hoàng, Khúc Thế Hồng Phong, Nguyễn Hoàng Phúc). Chúng tôi xin chân thành cảm ơn Ban tổ chức AI Challenge TP.HCM 2025 đã tạo điều kiện cho chúng tôi thực hiện dự án này.
 
-Mỗi thành viên xử lý một tập Keyframes tương ứng:
+## 🔗 Liên kết
+Bộ dữ liệu:: 
 
-python generate_captions.py --target L21
-
-
-Bước 2: Tối ưu hóa mô hình (Fine-tuning LoRA)
-
-Triển khai huấn luyện trên Google Colab với GPU T4:
-
-Notebook: MFusion-VR Fine-tuning Colab
-
-Phương pháp: Sử dụng file metadata_final.csv sau khi gộp từ các caption để huấn luyện thích nghi mô hình.
-
-Bước 3: Trích xuất Đặc trưng (Feature Extraction)
-
-Tải trọng số đã fine-tune (fine_tuned_model_lora_2025) và trích xuất lại vector để thay thế baseline cũ của BTC.
-
-💡 Các Kỹ thuật Đột phá (Technical Innovations)
-
-Relay Fine-Tuning: Kỹ thuật huấn luyện tiếp sức trên đám mây giúp mô hình học các thực thể đặc thù nhanh hơn 5-10 lần.
-
-Dual-Layer Caching Strategy: Đây là giải pháp tối ưu hóa hiệu năng cốt lõi của hệ thống, bao gồm:
-
-Disk Caching (hf_cache): Điều hướng lưu trữ các tài nguyên mô hình dung lượng lớn (CLIP weights, LoRA adapters) vào thư mục chỉ định qua biến HF_HOME. Kỹ thuật này giúp giải phóng phân vùng hệ thống, tránh việc tải lại mô hình từ Internet và đảm bảo tính sẵn sàng cao của tài nguyên vật lý.
-
-In-Memory Metadata Caching: Do Metadata cần truy xuất lặp đi lặp lại với tần suất cực cao cho các tính năng thời gian thực, hệ thống thực hiện nạp sẵn toàn bộ dữ liệu vào RAM khi khởi chạy. Giải pháp này triệt tiêu hoàn toàn độ trễ đọc file từ ổ đĩa (Disk I/O), đảm bảo dữ liệu được truyền lên UI ngay lập tức mà không gây nghẽn cổ chai.
-
-Temporal Interpolation: Thuật toán nội suy tuyến tính dựa trên FPS thực tế giúp ước tính chính xác frame_idx.
-
-Logical Engine (TRAKE.02): Thuật toán giao thoa kết quả giúp xử lý các câu hỏi "giao" của nhiều hành động/đối tượng.
-
-👥 Đội ngũ Phát triển
-
-Dự án MFusion-VR được thực hiện bởi [Tên Team của bạn]. Chúng tôi xin chân thành cảm ơn Ban tổ chức AI Challenge 2025 và UBND TP.HCM.
-
-Lưu ý: Dữ liệu Keyframes và trọng số mô hình thuộc quyền sở hữu của dự án. Vui lòng liên hệ nhóm để biết thêm chi tiết.
+⭐ Star this repository if it helped you! ⭐
