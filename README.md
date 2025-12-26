@@ -179,6 +179,6 @@ python app.py
 Dự án MFusion-VR được thực hiện bởi WuDButterflies (Nguyễn Thành Luân, Nguyễn Xuân Huy, Nguyễn Xuân Hoàng, Khúc Thế Hồng Phong, Nguyễn Hoàng Phúc). Chúng tôi xin chân thành cảm ơn Ban tổ chức AI Challenge TP.HCM 2025 đã tạo điều kiện cho chúng tôi thực hiện dự án này.
 
 ## 🔗 Liên kết
-Bộ dữ liệu:: 
+Bộ dữ liệu: (https://drive.google.com/drive/folders/1b3uVbcYAPcdEZvi64bVbHAktJR6f18S3?usp=sharing)
 
 ⭐ Star this repository if it helped you! ⭐
